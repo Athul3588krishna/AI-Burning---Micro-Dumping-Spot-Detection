@@ -1,0 +1,10 @@
+path: dataset
+
+train: train/images
+val: valid/images
+test: test/images
+
+names:
+  0: Garbage_Pile
+  1: Smoke
+  2: Fire
