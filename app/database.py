@@ -1,19 +1,27 @@
+import os
 import sqlite3
 from app.config import DATABASE_PATH
 
 
 def create_database():
+    """
+    Creates the violations SQLite database and table if they do not exist.
+    """
+    # Ensure logs directory exists
+    os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
+
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS violations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            camera_id TEXT,
-            detection_type TEXT,
+            filename TEXT,
+            violation_type TEXT,
             confidence REAL,
             timestamp TEXT,
-            image_path TEXT
+            screenshot_path TEXT,
+            status TEXT DEFAULT 'Pending'
         )
     """)
 
@@ -21,21 +29,24 @@ def create_database():
     conn.close()
 
 
-def insert_violation(camera_id, detection_type, confidence, timestamp, image_path):
-
+def insert_violation(filename, violation_type, confidence, timestamp, screenshot_path, status='Pending'):
+    """
+    Inserts a new violation record.
+    """
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
         INSERT INTO violations
-        (camera_id,detection_type,confidence,timestamp,image_path)
-        VALUES (?,?,?,?,?)
+        (filename, violation_type, confidence, timestamp, screenshot_path, status)
+        VALUES (?, ?, ?, ?, ?, ?)
     """, (
-        camera_id,
-        detection_type,
+        filename,
+        violation_type,
         confidence,
         timestamp,
-        image_path
+        screenshot_path,
+        status
     ))
 
     conn.commit()
@@ -43,7 +54,9 @@ def insert_violation(camera_id, detection_type, confidence, timestamp, image_pat
 
 
 def get_all_violations():
-
+    """
+    Retrieves all logged violations, ordered by ID descending.
+    """
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
@@ -54,7 +67,39 @@ def get_all_violations():
     """)
 
     rows = cursor.fetchall()
-
     conn.close()
 
     return rows
+
+
+def update_violation_status(violation_id, status):
+    """
+    Updates the status of a specific violation (e.g., Pending, Resolved, Spurious).
+    """
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE violations
+        SET status = ?
+        WHERE id = ?
+    """, (status, violation_id))
+
+    conn.commit()
+    conn.close()
+
+
+def delete_violation(violation_id):
+    """
+    Deletes a specific violation by ID.
+    """
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        DELETE FROM violations
+        WHERE id = ?
+    """, (violation_id,))
+
+    conn.commit()
+    conn.close()

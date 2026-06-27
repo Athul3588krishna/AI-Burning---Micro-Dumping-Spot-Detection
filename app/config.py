@@ -8,7 +8,11 @@ DATABASE_PATH = os.path.join(BASE_DIR, "logs", "violations.db")
 
 SCREENSHOT_DIR = os.path.join(BASE_DIR, "logs", "screenshots")
 
-VIDEO_PATH = os.path.join(BASE_DIR, "videos", "sample.mp4")
+# Upload and Output Directories
+UPLOAD_IMAGE_DIR = os.path.join(BASE_DIR, "uploads", "images")
+UPLOAD_VIDEO_DIR = os.path.join(BASE_DIR, "uploads", "videos")
+OUTPUT_IMAGE_DIR = os.path.join(BASE_DIR, "outputs", "images")
+OUTPUT_VIDEO_DIR = os.path.join(BASE_DIR, "outputs", "videos")
 
 CONFIDENCE_THRESHOLD = 0.5
 
