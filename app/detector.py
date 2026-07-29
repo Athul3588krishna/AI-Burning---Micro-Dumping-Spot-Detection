@@ -1,3 +1,4 @@
+from .preprocess import resize_frame_with_aspect_ratio
 import os
 import cv2
 import time
